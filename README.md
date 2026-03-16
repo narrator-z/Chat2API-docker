@@ -31,6 +31,8 @@ This project provides a Docker containerization of [Chat2API](https://github.com
 
 ### Quick Start
 
+#### Option 1: Using Pre-built Image (Recommended)
+
 1. Clone this repository:
    ```bash
    git clone https://github.com/narrator-z/Chat2API-docker.git
@@ -42,14 +44,38 @@ This project provides a Docker containerization of [Chat2API](https://github.com
    mkdir config
    ```
 
-3. Build and run with Docker Compose:
+3. Start with the published image:
    ```bash
    docker-compose up -d
    ```
 
-4. Access the application:
-   - Web Interface: http://localhost:6080
-   - API Endpoint: http://localhost:8080
+#### Option 2: Building from Source
+
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/narrator-z/Chat2API-docker.git
+   cd Chat2API-docker
+   ```
+
+2. Create a config directory (optional):
+   ```bash
+   mkdir config
+   ```
+
+3. Build and run from source:
+   ```bash
+   docker-compose -f docker-compose.build.yml up -d
+   ```
+
+#### Access the Application
+
+- Web Interface: http://localhost:6080
+- API Endpoint: http://localhost:8080
+
+### Docker Compose Files
+
+- **`docker-compose.yml`** - Uses the pre-built image from GitHub Container Registry
+- **`docker-compose.build.yml`** - Builds the image from source locally
 
 ### Configuration
 
@@ -143,6 +169,8 @@ print(response.choices[0].message.content)
 
 ### 快速开始
 
+#### 选项 1：使用预构建镜像（推荐）
+
 1. 克隆此仓库：
    ```bash
    git clone https://github.com/narrator-z/Chat2API-docker.git
@@ -154,14 +182,38 @@ print(response.choices[0].message.content)
    mkdir config
    ```
 
-3. 使用 Docker Compose 构建并运行：
+3. 使用发布镜像启动：
    ```bash
    docker-compose up -d
    ```
 
-4. 访问应用程序：
-   - Web 界面：http://localhost:6080
-   - API 端点：http://localhost:8080
+#### 选项 2：从源代码构建
+
+1. 克隆此仓库：
+   ```bash
+   git clone https://github.com/narrator-z/Chat2API-docker.git
+   cd Chat2API-docker
+   ```
+
+2. 创建配置目录（可选）：
+   ```bash
+   mkdir config
+   ```
+
+3. 从源代码构建并运行：
+   ```bash
+   docker-compose -f docker-compose.build.yml up -d
+   ```
+
+#### 访问应用程序
+
+- Web 界面：http://localhost:6080
+- API 端点：http://localhost:8080
+
+### Docker Compose 文件
+
+- **`docker-compose.yml`** - 使用 GitHub Container Registry 中的预构建镜像
+- **`docker-compose.build.yml`** - 从源代码本地构建镜像
 
 ### 配置
 

@@ -21,12 +21,21 @@ GITHUB_API_URL="https://api.github.com/repos/xiaoY233/Chat2API/releases/latest"
 
 # 下载 AppImage
 echo "正在下载 Chat2API $ARCH 版本..."
-LATEST_RELEASE=$(curl -s "$GITHUB_API_URL" | \
-grep "browser_download_url.*${APPIMAGE_SUFFIX}" | \
-cut -d '"' -f 4)
+echo "查询 GitHub API: $GITHUB_API_URL"
+
+# 获取完整的 API 响应用于调试
+API_RESPONSE=$(curl -s "$GITHUB_API_URL")
+echo "API 响应 (前 500 字符):"
+echo "$API_RESPONSE" | head -c 500
+echo ""
+
+# 查找对应的 AppImage 下载链接
+LATEST_RELEASE=$(echo "$API_RESPONSE" | grep "browser_download_url.*${APPIMAGE_SUFFIX}" | cut -d '"' -f 4)
 
 if [ -z "$LATEST_RELEASE" ]; then
     echo "错误: 无法找到 $ARCH 版本的 AppImage"
+    echo "尝试查找所有 AppImage 链接:"
+    echo "$API_RESPONSE" | grep "browser_download_url" | head -5
     exit 1
 fi
 

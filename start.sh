@@ -19,12 +19,6 @@ fi
 # 设置 GitHub API URL
 GITHUB_API_URL="https://api.github.com/repos/xiaoY233/Chat2API/releases/latest"
 
-# 如果启用了 GitHub CDN 代理
-if [ "$USE_GITHUB_CDN" = "true" ]; then
-    echo "使用 GitHub CDN 代理: https://gh-proxy.org/"
-    GITHUB_API_URL="https://gh-proxy.org/https://api.github.com/repos/xiaoY233/Chat2API/releases/latest"
-fi
-
 # 下载 AppImage
 echo "正在下载 Chat2API $ARCH 版本..."
 LATEST_RELEASE=$(curl -s "$GITHUB_API_URL" | \
@@ -40,6 +34,7 @@ echo "下载地址: $LATEST_RELEASE"
 
 # 如果启用了 GitHub CDN 代理，替换下载 URL
 if [ "$USE_GITHUB_CDN" = "true" ]; then
+    echo "使用 GitHub CDN 代理: https://gh-proxy.org/"
     LATEST_RELEASE="https://gh-proxy.org/$LATEST_RELEASE"
 fi
 

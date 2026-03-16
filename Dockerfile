@@ -30,13 +30,17 @@ RUN apt update && apt install -y \
 
 WORKDIR /app
 
-# Download the latest x86_64 AppImage from Chat2API releases
+# Download the latest AppImage from Chat2API releases based on architecture
 RUN ARCH=$(dpkg --print-architecture) && \
     if [ "$ARCH" = "amd64" ]; then \
         ARCH="x86_64"; \
+        APPIMAGE_SUFFIX="x86_64.AppImage"; \
+    elif [ "$ARCH" = "arm64" ] || [ "$ARCH" = "aarch64" ]; then \
+        ARCH="arm64"; \
+        APPIMAGE_SUFFIX="arm64.AppImage"; \
     fi && \
     LATEST_RELEASE=$(curl -s https://api.github.com/repos/xiaoY233/Chat2API/releases/latest | \
-    grep "browser_download_url.*${ARCH}.*AppImage" | \
+    grep "browser_download_url.*${APPIMAGE_SUFFIX}" | \
     cut -d '"' -f 4) && \
     curl -L -o /app/app.AppImage "$LATEST_RELEASE"
 COPY start.sh /app/start.sh

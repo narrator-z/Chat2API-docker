@@ -2,6 +2,52 @@
 
 export DISPLAY=:99
 
+echo "=== 下载 Chat2API AppImage ==="
+# 检测架构并下载对应的 AppImage
+ARCH=$(dpkg --print-architecture)
+if [ "$ARCH" = "amd64" ]; then
+    ARCH="x86_64"
+    APPIMAGE_SUFFIX="x86_64.AppImage"
+elif [ "$ARCH" = "arm64" ] || [ "$ARCH" = "aarch64" ]; then
+    ARCH="arm64"
+    APPIMAGE_SUFFIX="arm64.AppImage"
+else
+    echo "不支持的架构: $ARCH"
+    exit 1
+fi
+
+# 设置 GitHub API URL
+GITHUB_API_URL="https://api.github.com/repos/xiaoY233/Chat2API/releases/latest"
+
+# 如果启用了 GitHub CDN 代理
+if [ "$USE_GITHUB_CDN" = "true" ]; then
+    echo "使用 GitHub CDN 代理: https://gh-proxy.org/"
+    GITHUB_API_URL="https://gh-proxy.org/https://api.github.com/repos/xiaoY233/Chat2API/releases/latest"
+fi
+
+# 下载 AppImage
+echo "正在下载 Chat2API $ARCH 版本..."
+LATEST_RELEASE=$(curl -s "$GITHUB_API_URL" | \
+grep "browser_download_url.*${APPIMAGE_SUFFIX}" | \
+cut -d '"' -f 4)
+
+if [ -z "$LATEST_RELEASE" ]; then
+    echo "错误: 无法找到 $ARCH 版本的 AppImage"
+    exit 1
+fi
+
+echo "下载地址: $LATEST_RELEASE"
+
+# 如果启用了 GitHub CDN 代理，替换下载 URL
+if [ "$USE_GITHUB_CDN" = "true" ]; then
+    LATEST_RELEASE="https://gh-proxy.org/$LATEST_RELEASE"
+fi
+
+curl -L -o /app/app.AppImage "$LATEST_RELEASE"
+chmod +x /app/app.AppImage
+
+echo "AppImage 下载完成"
+
 echo "=== 清理残留的 X 服务器锁文件 ==="
 rm -f /tmp/.X99-lock
 rm -f /tmp/.X11-unix/X99

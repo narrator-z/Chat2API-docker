@@ -2,6 +2,8 @@ services:
   chat2api:
     image: ghcr.io/narrator-z/chat2api-docker:main
     container_name: chat2api
+    environment:
+      - USE_GITHUB_CDN=false
     ports:
       - "6080:6080"
       - "8080:8080"

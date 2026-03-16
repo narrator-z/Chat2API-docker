@@ -77,6 +77,25 @@ This project provides a Docker containerization of [Chat2API](https://github.com
 - **`docker-compose.yml`** - Uses the pre-built image from GitHub Container Registry
 - **`docker-compose.build.yml`** - Builds the image from source locally
 
+### GitHub CDN Proxy
+
+For users in regions with slow GitHub access, you can enable GitHub CDN proxy:
+
+1. Edit your `docker-compose.yml` or `docker-compose.build.yml`:
+   ```yaml
+   services:
+     chat2api:
+       environment:
+         - USE_GITHUB_CDN=true
+   ```
+
+2. Or use environment variable:
+   ```bash
+   USE_GITHUB_CDN=true docker-compose up -d
+   ```
+
+When enabled, the AppImage will be downloaded through `https://gh-proxy.org/` for faster access.
+
 ### Configuration
 
 - Configuration files should be placed in the `./config` directory
@@ -214,6 +233,25 @@ print(response.choices[0].message.content)
 
 - **`docker-compose.yml`** - 使用 GitHub Container Registry 中的预构建镜像
 - **`docker-compose.build.yml`** - 从源代码本地构建镜像
+
+### GitHub CDN 代理
+
+对于 GitHub 访问较慢地区的用户，可以启用 GitHub CDN 代理：
+
+1. 编辑你的 `docker-compose.yml` 或 `docker-compose.build.yml`：
+   ```yaml
+   services:
+     chat2api:
+       environment:
+         - USE_GITHUB_CDN=true
+   ```
+
+2. 或使用环境变量：
+   ```bash
+   USE_GITHUB_CDN=true docker-compose up -d
+   ```
+
+启用后，AppImage 将通过 `https://gh-proxy.org/` 下载以获得更快的访问速度。
 
 ### 配置
 

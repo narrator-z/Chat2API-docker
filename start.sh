@@ -25,9 +25,6 @@ echo "查询 GitHub API: $GITHUB_API_URL"
 
 # 获取完整的 API 响应用于调试
 API_RESPONSE=$(curl -s "$GITHUB_API_URL")
-echo "API 响应 (前 500 字符):"
-echo "$API_RESPONSE" | head -c 500
-echo ""
 
 # 查找对应的 AppImage 下载链接
 LATEST_RELEASE=$(echo "$API_RESPONSE" | grep "browser_download_url.*${APPIMAGE_SUFFIX}" | cut -d '"' -f 4)
@@ -40,15 +37,7 @@ if [ -z "$LATEST_RELEASE" ]; then
 fi
 
 echo "下载地址: $LATEST_RELEASE"
-
-# 如果启用了 GitHub CDN 代理，替换下载 URL
-if [ "$USE_GITHUB_CDN" = "true" ]; then
-    echo "使用 GitHub CDN 代理: https://gh-proxy.org/"
-    LATEST_RELEASE="https://gh-proxy.org/$LATEST_RELEASE"
-    echo "最终下载地址: $LATEST_RELEASE"
-else
-    echo "最终下载地址: $LATEST_RELEASE"
-fi
+echo "最终下载地址: $LATEST_RELEASE"
 
 echo "开始下载 AppImage..."
 curl -L -o /app/downloads/app.AppImage "$LATEST_RELEASE"

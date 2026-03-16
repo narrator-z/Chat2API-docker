@@ -3,7 +3,7 @@ services:
     build: .
     container_name: chat2api
     environment:
-      - USE_GITHUB_CDN=true
+      - USE_GITHUB_CDN=false
     ports:
       - "6080:6080"
       - "8080:8080"

@@ -6,8 +6,6 @@ name: Docker
 # documentation.
 
 env:
-  # Opt into Node.js 24 now
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
@@ -28,6 +26,9 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      # Opt into Node.js 24 now
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     permissions:
       contents: read
       packages: write

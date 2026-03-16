@@ -36,8 +36,12 @@ echo "下载地址: $LATEST_RELEASE"
 if [ "$USE_GITHUB_CDN" = "true" ]; then
     echo "使用 GitHub CDN 代理: https://gh-proxy.org/"
     LATEST_RELEASE="https://gh-proxy.org/$LATEST_RELEASE"
+    echo "最终下载地址: $LATEST_RELEASE"
+else
+    echo "最终下载地址: $LATEST_RELEASE"
 fi
 
+echo "开始下载 AppImage..."
 curl -L -o /app/downloads/app.AppImage "$LATEST_RELEASE"
 chmod +x /app/downloads/app.AppImage
 

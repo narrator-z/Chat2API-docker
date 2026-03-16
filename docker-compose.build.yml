@@ -1,6 +1,6 @@
 services:
-  chat2api:
-    image: ghcr.io/narrator-z/chat2api-docker:main
+  electron:
+    build: .
     container_name: chat2api
     ports:
       - "6080:6080"

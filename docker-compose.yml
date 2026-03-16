@@ -1,0 +1,14 @@
+services:
+  electron:
+    build: .
+    container_name: chat2api
+    ports:
+      - "6080:6080"
+      - "8080:8080"
+    restart: unless-stopped
+    volumes:
+      - ./config:/root/
+networks:
+  chat2api:
+    external: true
+    name: chat2api

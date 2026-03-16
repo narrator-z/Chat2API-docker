@@ -43,8 +43,8 @@ if [ "$USE_GITHUB_CDN" = "true" ]; then
     LATEST_RELEASE="https://gh-proxy.org/$LATEST_RELEASE"
 fi
 
-curl -L -o /app/app.AppImage "$LATEST_RELEASE"
-chmod +x /app/app.AppImage
+curl -L -o /app/downloads/app.AppImage "$LATEST_RELEASE"
+chmod +x /app/downloads/app.AppImage
 
 echo "AppImage 下载完成"
 
@@ -139,7 +139,7 @@ if [ $? -eq 0 ]; then
     echo "X server :99 可访问，启动应用..."
     
     # 启动应用
-    /app/app.AppImage \
+    /app/downloads/app.AppImage \
         --appimage-extract-and-run \
         --no-sandbox \
         --disable-gpu \

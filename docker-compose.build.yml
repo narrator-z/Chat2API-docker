@@ -10,7 +10,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./config:/root/
-      - ./app:/app
+      - ./downloads:/app/downloads
 networks:
   chat2api:
     external: true

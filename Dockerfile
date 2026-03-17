@@ -31,8 +31,9 @@ RUN apt update && apt install -y \
 WORKDIR /app
 
 COPY start.sh /app/start.sh
+COPY download-appimage.sh /app/download-appimage.sh
 
-RUN chmod +x /app/start.sh
+RUN chmod +x /app/start.sh /app/download-appimage.sh
 
 EXPOSE 6080 5900
 

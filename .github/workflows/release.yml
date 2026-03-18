@@ -1,0 +1,78 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get the previous tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          
+          # Generate changelog
+          if [ -n "$PREVIOUS_TAG" ]; then
+            CHANGELOG=$(git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD)
+          else
+            CHANGELOG=$(git log --pretty=format:"- %s")
+          fi
+          
+          # Save to file
+          echo "$CHANGELOG" > CHANGELOG.md
+          
+          # Set output
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ github.ref_name }}
+          body: |
+            ## Chat2API Docker ${{ github.ref_name }}
+            
+            ### Features
+            - Docker containerization of Chat2API for headless operation
+            - Automatic AppImage download on first startup
+            - GitHub CDN proxy support for faster downloads
+            - Multi-architecture support (x86_64 and ARM64)
+            - Web interface via noVNC
+            - Volume mounts for config and downloads
+            
+            ### Quick Start
+            ```bash
+            git clone https://github.com/narrator-z/Chat2API-docker.git
+            cd Chat2API-docker
+            docker-compose up -d
+            ```
+            
+            ### Access
+            - Web Interface: http://localhost:6080
+            - API Endpoint: http://localhost:8080
+            
+            ### Changes
+            ${{ steps.changelog.outputs.changelog }}
+            
+            ### Docker Image
+            ```bash
+            docker pull ghcr.io/narrator-z/chat2api-docker:${{ github.ref_name }}
+            ```
+          files: |
+            CHANGELOG.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

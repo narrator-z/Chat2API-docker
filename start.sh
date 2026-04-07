@@ -56,6 +56,9 @@ echo "=== 启动 XPRA (HTML5) ==="
 xpra start :100 \
   --bind-tcp=0.0.0.0:14500 \
   --html=on \
+  --dbus=no \
+  --notifications=no \
+  --mdns=no \
   --start-child="${APP_RUN} \
     --no-sandbox \
     --disable-gpu \
@@ -63,7 +66,6 @@ xpra start :100 \
     --disable-software-rasterizer \
     --disable-setuid-sandbox \
     --ozone-platform=x11" \
-  --exit-with-children=yes \
   --daemon=no
 
 echo "=== Application started ==="

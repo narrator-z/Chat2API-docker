@@ -20,6 +20,8 @@ RUN apt update && apt install -y \
     websockify \
     novnc \
     x11vnc \
+    dbus \
+    dbus-x11 \
     libgtk-3-0 \
     libnss3 \
     libxss1 \

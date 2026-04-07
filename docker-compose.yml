@@ -1,16 +1,24 @@
 services:
   chat2api:
-    image: ghcr.io/narrator-z/chat2api-docker:main
+    image: ghcr.io/narrator-z/chat2api-docker:latest
     container_name: chat2api
     environment:
       - USE_GITHUB_CDN=true
     ports:
       - "6080:6080"
       - "8080:8080"
-    restart: unless-stopped
+    restart: always
     volumes:
       - ./config:/root/
       - ./downloads:/app/downloads
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'      # CPU限制，最多使用1个CPU核心
+          memory: 4096M     # 内存限制，最多512MB
+        reservations:
+          cpus: '0.5'      # 保留CPU资源，至少0.5个核心
+          memory: 256M     # 保留内存资源，至少256MB
 networks:
   chat2api:
     external: true

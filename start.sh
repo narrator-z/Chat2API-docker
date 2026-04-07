@@ -1,161 +1,112 @@
 #!/bin/bash
+set -euo pipefail
 
 export DISPLAY=:99
+export NO_AT_BRIDGE=1
+export LIBGL_ALWAYS_SOFTWARE=1
+export ELECTRON_OZONE_PLATFORM_HINT=x11
+export ELECTRON_ENABLE_LOGGING=1
+export ELECTRON_ENABLE_STACK_DUMPING=1
 
-# 检查是否已经下载过 AppImage
-if [ ! -f "/app/downloads/.appimage_downloaded" ]; then
-    echo "=== 首次启动，下载 Chat2API AppImage ==="
+APP_DIR=/app/downloads
+APP_IMAGE=${APP_DIR}/app.AppImage
+LOG_FILE=/app/electron.log
+
+# 首次下载 AppImage
+if [ ! -f "${APP_DIR}/.appimage_downloaded" ]; then
+    echo "=== 首次启动，下载 AppImage ==="
     /app/download-appimage.sh
 else
     echo "=== AppImage 已存在，跳过下载 ==="
 fi
 
-echo "=== 清理残留的 X 服务器锁文件 ==="
+# 清理残留 X 锁
 rm -f /tmp/.X99-lock
 rm -f /tmp/.X11-unix/X99
 
-echo "=== 初始化 DBus 环境 ==="
-mkdir -p /run/dbus /var/run/dbus
-chmod 755 /run/dbus /var/run/dbus
-
-# 生成 machine-id
-if [ ! -f /etc/machine-id ]; then
-    dbus-uuidgen > /etc/machine-id
-fi
-if [ ! -f /var/lib/dbus/machine-id ]; then
-    mkdir -p /var/lib/dbus
-    cp /etc/machine-id /var/lib/dbus/machine-id
-fi
-
-# 启动 DBus
-echo "启动 DBus..."
-rm -f /run/dbus/system_bus_socket
-dbus-daemon --system --fork
-export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket
-
-echo "=== 启动 X 服务器 ==="
-# 使用更详细的参数启动 Xvfb
-Xvfb :99 -screen 0 1920x1080x24 -ac +extension GLX +render -noreset &
+# 启动 Xvfb
+echo "=== 启动 Xvfb :99 ==="
+Xvfb :99 -screen 0 1920x1080x24 -ac +extension GLX +render &
 XVFB_PID=$!
-
-# 等待 Xvfb 完全启动
-echo "等待 Xvfb 启动..."
-sleep 3
-
-# 验证 Xvfb 是否正常运行
-if ! xdpyinfo -display :99 >/dev/null 2>&1; then
-    echo "Xvfb 启动失败，重试..."
-    kill $XVFB_PID 2>/dev/null
-    rm -f /tmp/.X99-lock
-    Xvfb :99 -screen 0 1920x1080x24 -ac &
-    sleep 3
-fi
-
-echo "Xvfb 已启动，PID: $XVFB_PID"
-
-echo "=== 启动窗口管理器 ==="
-fluxbox &
-FLUXBOX_PID=$!
-sleep 1
-
-echo "=== 启动 VNC 服务器 ==="
-# 确保 x11vnc 能够连接到 X server
-x11vnc -display :99 \
-    -nopw \
-    -forever \
-    -shared \
-    -ncache 10 \
-    -ncache_cr \
-    -noshm \
-    -noipv6 \
-    -rfbport 5900 &
-VNC_PID=$!
-
-# 等待 VNC 启动
 sleep 2
 
-# 验证 VNC 是否运行
-if ! nc -z localhost 5900 2>/dev/null; then
-    echo "VNC 服务器启动失败，重试..."
-    kill $VNC_PID 2>/dev/null
-    x11vnc -display :99 -nopw -forever -shared -rfbport 5900 &
-    sleep 2
+# 检查 Xvfb 是否可用
+if ! xdpyinfo -display :99 >/dev/null 2>&1; then
+    echo "Xvfb 启动失败，退出"
+    kill ${XVFB_PID} 2>/dev/null || true
+    exit 1
 fi
+echo "Xvfb 已启动 PID=${XVFB_PID}"
 
-echo "=== 启动 noVNC ==="
+# 启动 x11vnc
+echo "=== 启动 x11vnc ==="
+x11vnc -display :99 -nopw -forever -shared -rfbport 5900 &
+VNC_PID=$!
+sleep 1
+
+# 启动 noVNC (websockify)
+echo "=== 启动 noVNC(websockify) ==="
+# 如果 /usr/share/novnc 路径不存在，websockify 仍会启动，但 noVNC 页面可能不可用
 websockify --web=/usr/share/novnc/ 6080 localhost:5900 &
 WEBSOCKIFY_PID=$!
 sleep 1
 
+# 启动 Electron AppImage
 echo "=== 启动 Electron App ==="
-
-# 设置环境变量
-export ELECTRON_ENABLE_LOGGING=1
-export ELECTRON_ENABLE_STACK_DUMPING=1
-export NO_AT_BRIDGE=1
-export LIBGL_ALWAYS_SOFTWARE=1  # 使用软件渲染
-
-# 验证 X server 是否可访问
-xdpyinfo -display :99 >/dev/null 2>&1
-if [ $? -eq 0 ]; then
-    echo "X server :99 可访问，启动应用..."
-    
-    # 启动应用
-    /app/downloads/app.AppImage \
-        --appimage-extract-and-run \
-        --no-sandbox \
-        --disable-gpu \
-        --disable-dev-shm-usage \
-        --disable-setuid-sandbox \
-        --disable-features=VizDisplayCompositor \
-        --use-gl=swiftshader \
-        --ozone-platform=x11 \
-        --enable-logging=stderr \
-        2>&1 | tee /app/electron.log &
-    APP_PID=$!
-    
-    echo "应用已启动，PID: $APP_PID"
-else
-    echo "错误: 无法访问 X server :99"
+if [ ! -x "${APP_IMAGE}" ]; then
+    echo "错误: 找不到 AppImage: ${APP_IMAGE}"
     exit 1
 fi
 
-echo "=== 所有服务已启动 ==="
-echo "Xvfb PID: $XVFB_PID"
-echo "Fluxbox PID: $FLUXBOX_PID"
-echo "VNC PID: $VNC_PID"
-echo "noVNC PID: $WEBSOCKIFY_PID"
-echo "App PID: $APP_PID"
-echo ""
-echo "访问 noVNC: http://$(hostname -i):6080/vnc.html"
-echo "或使用 VNC 客户端连接: $(hostname -i):5900"
+# 以后台方式启动并记录日志
+"${APP_IMAGE}" \
+    --no-sandbox \
+    --disable-gpu \
+    --disable-software-rasterizer \
+    --disable-dev-shm-usage \
+    --disable-setuid-sandbox \
+    --disable-features=VizDisplayCompositor \
+    --ozone-platform=x11 \
+    2>&1 | tee "${LOG_FILE}" &
+APP_PID=$!
 
-# 监控进程状态（但不重启，避免重复启动问题）
+echo "应用已启动 PID=${APP_PID} 日志: ${LOG_FILE}"
+
+# 清理函数
+cleanup() {
+    echo "收到退出信号，清理进程..."
+    kill ${APP_PID} 2>/dev/null || true
+    kill ${WEBSOCKIFY_PID} 2>/dev/null || true
+    kill ${VNC_PID} 2>/dev/null || true
+    kill ${XVFB_PID} 2>/dev/null || true
+    wait 2>/dev/null || true
+    exit 0
+}
+trap cleanup SIGINT SIGTERM
+
+# 监控循环（简单监控，不自动重启主应用）
 while true; do
-    sleep 30
-    
-    # 检查关键进程是否还在运行
-    if ! kill -0 $XVFB_PID 2>/dev/null; then
-        echo "错误: Xvfb 已停止，容器将退出"
+    sleep 10
+
+    if ! kill -0 ${XVFB_PID} 2>/dev/null; then
+        echo "错误: Xvfb 已停止，退出容器"
         exit 1
     fi
-    
-    if ! kill -0 $VNC_PID 2>/dev/null; then
-        echo "警告: VNC 服务器已停止，尝试重启..."
+
+    if ! kill -0 ${VNC_PID} 2>/dev/null; then
+        echo "警告: x11vnc 已停止，尝试重启..."
         x11vnc -display :99 -nopw -forever -shared -rfbport 5900 &
         VNC_PID=$!
     fi
-    
-    if ! kill -0 $WEBSOCKIFY_PID 2>/dev/null; then
+
+    if ! kill -0 ${WEBSOCKIFY_PID} 2>/dev/null; then
         echo "警告: noVNC 已停止，尝试重启..."
         websockify --web=/usr/share/novnc/ 6080 localhost:5900 &
         WEBSOCKIFY_PID=$!
     fi
-    
-    if ! kill -0 $APP_PID 2>/dev/null; then
-        echo "警告: 应用已停止，查看日志: /app/electron.log"
-        # 可以选择重启应用
-        # /app/app.AppImage --appimage-extract-and-run --no-sandbox --disable-gpu 2>&1 | tee /app/electron.log &
-        # APP_PID=$!
+
+    if ! kill -0 ${APP_PID} 2>/dev/null; then
+        echo "警告: 应用已停止，查看日志: ${LOG_FILE}"
+        # 不自动重启应用，避免重复启动导致资源泄露
     fi
 done

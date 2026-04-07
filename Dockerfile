@@ -41,6 +41,6 @@ COPY download-appimage.sh /app/download-appimage.sh
 
 RUN chmod +x /app/start.sh /app/download-appimage.sh
 
-EXPOSE 6080 5900
+EXPOSE 14500 8080
 
 CMD ["/app/start.sh"]

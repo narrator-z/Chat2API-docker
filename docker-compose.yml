@@ -12,7 +12,7 @@ services:
 
     volumes:
       - ./downloads:/app/downloads
-      #- ./start.sh:/app/start.sh:ro
+      - ./start.sh:/app/start.sh:ro
       - ./download-appimage.sh:/app/download-appimage.sh:ro
 
     restart: always

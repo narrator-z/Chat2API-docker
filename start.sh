@@ -38,6 +38,9 @@ fi
 
 APP_RUN="${EXTRACT_DIR}/AppRun"
 
+# Set APPDIR for AppRun script to find chat2api binary
+export APPDIR="${EXTRACT_DIR}"
+
 echo "=== Cleanup Xvfb lock files ==="
 rm -f /tmp/.X99-lock /tmp/.X11-unix/X99
 
@@ -58,7 +61,7 @@ xpra start :100 \
   --html=on \
   --notifications=no \
   --mdns=no \
-  --start-child="${APP_RUN} \
+  --start="${APP_RUN} \
     --no-sandbox \
     --disable-gpu \
     --disable-dev-shm-usage \

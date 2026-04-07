@@ -3,19 +3,23 @@ FROM debian:12
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DISPLAY=:99
 
-# 国内源
+# 换源
 RUN echo "deb http://mirrors.aliyun.com/debian bookworm main contrib non-free non-free-firmware" > /etc/apt/sources.list && \
     echo "deb http://mirrors.aliyun.com/debian bookworm-updates main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
     echo "deb http://mirrors.aliyun.com/debian-security bookworm-security main contrib non-free non-free-firmware" >> /etc/apt/sources.list
 
+# 安装 xpra + headless X + noVNC依赖
 RUN apt update && apt install -y \
     curl \
     xvfb \
     xpra \
-    xpra-html5 \
     x11-utils \
+    netcat-openbsd \
     ca-certificates \
     iproute2 \
+    websockify \
+    novnc \
+    x11vnc \
     libgtk-3-0 \
     libnss3 \
     libxss1 \
@@ -37,6 +41,6 @@ COPY download-appimage.sh /app/download-appimage.sh
 
 RUN chmod +x /app/start.sh /app/download-appimage.sh
 
-EXPOSE 14500
+EXPOSE 6080 5900
 
 CMD ["/app/start.sh"]

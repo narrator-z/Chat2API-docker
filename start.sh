@@ -56,7 +56,6 @@ echo "=== 启动 XPRA (HTML5) ==="
 xpra start :100 \
   --bind-tcp=0.0.0.0:14500 \
   --html=on \
-  --dbus=no \
   --notifications=no \
   --mdns=no \
   --start-child="${APP_RUN} \

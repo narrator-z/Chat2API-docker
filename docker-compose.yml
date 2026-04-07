@@ -1,34 +1,21 @@
 services:
   chat2api:
     image: ghcr.io/narrator-z/chat2api-docker:latest
+
     container_name: chat2api
-    environment:
-      - USE_GITHUB_CDN=true
-      - DISPLAY=:99
+
     ports:
-      - "6080:6080"   # noVNC web
-      - "5900:5900"   # VNC
-      - "58002:8080"  # 保留你原来的映射（如需要）
-    restart: always
+      - "14500:14500"
+      - "58002:8080"
+    environment:
+      - DISPLAY=:99
+
     volumes:
-      - ./config:/root/
       - ./downloads:/app/downloads
-    devices:
-      - /dev/fuse:/dev/fuse
-    cap_add:
-      - SYS_ADMIN
-    security_opt:
-      - seccomp=unconfined
-    tmpfs:
-      - /dev/shm:size=2g
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 4096M
-        reservations:
-          cpus: '0.5'
-          memory: 256M
+      #- ./start.sh:/app/start.sh:ro
+      - ./download-appimage.sh:/app/download-appimage.sh:ro
+
+    restart: always
 
 networks:
   chat2api:

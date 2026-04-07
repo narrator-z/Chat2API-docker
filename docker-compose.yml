@@ -6,7 +6,7 @@ services:
       - USE_GITHUB_CDN=true
     ports:
       - "6080:6080"
-      - "8080:8080"
+      - "58002:8080"
     restart: always
     volumes:
       - ./config:/root/

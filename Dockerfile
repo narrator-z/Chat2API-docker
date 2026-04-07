@@ -8,7 +8,7 @@ RUN echo "deb http://mirrors.aliyun.com/debian bookworm main contrib non-free no
     echo "deb http://mirrors.aliyun.com/debian bookworm-updates main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
     echo "deb http://mirrors.aliyun.com/debian-security bookworm-security main contrib non-free non-free-firmware" >> /etc/apt/sources.list
 
-# 安装 xpra + headless X + noVNC依赖
+# Install xpra + headless X + noVNC dependencies + Chinese fonts
 RUN apt update && apt install -y \
     curl \
     xvfb \
@@ -22,6 +22,8 @@ RUN apt update && apt install -y \
     x11vnc \
     dbus \
     dbus-x11 \
+    fonts-wqy-zenhei \
+    fonts-wqy-microhei \
     libgtk-3-0 \
     libnss3 \
     libxss1 \

@@ -70,6 +70,7 @@ if ! command -v true &> /dev/null; then
 fi
 
 xpra start :42 \
+  --use-display \
   --bind-tcp=0.0.0.0:14500 \
   --html=on \
   --notifications=no \

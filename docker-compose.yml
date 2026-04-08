@@ -7,8 +7,6 @@ services:
     ports:
       - "14500:14500"
       - "58002:8080"
-    environment:
-      - DISPLAY=:99
 
     volumes:
       - ./downloads:/app/downloads

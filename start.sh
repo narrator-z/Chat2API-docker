@@ -13,7 +13,7 @@ cleanup() {
 # Set trap for cleanup
 trap cleanup SIGTERM SIGINT EXIT
 
-export DISPLAY=:99
+export DISPLAY=:42
 export LIBGL_ALWAYS_SOFTWARE=1
 export NO_AT_BRIDGE=2
 
@@ -48,6 +48,7 @@ echo "exit 0" >> /etc/X11/Xsession
 chmod +x /etc/X11/Xsession
 
 echo "=== Cleanup Xvfb lock files ==="
+rm -f /tmp/.X42-lock /tmp/.X11-unix/X42
 rm -f /tmp/.X99-lock /tmp/.X11-unix/X99
 rm -f /tmp/.X100-lock /tmp/.X11-unix/X100
 
@@ -58,7 +59,7 @@ if ! command -v xpra &> /dev/null; then
 fi
 
 echo "=== Start Xvfb ==="
-Xvfb :99 -screen 0 2560x1440x24 -ac +extension GLX +render &
+Xvfb :42 -screen 0 2560x1440x24 -ac +extension GLX +render &
 sleep 2
 
 echo "=== 启动 XPRA (HTML5) ==="
@@ -68,7 +69,7 @@ if ! command -v true &> /dev/null; then
   apt update && apt install -y coreutils
 fi
 
-xpra start :99 \
+xpra start :42 \
   --bind-tcp=0.0.0.0:14500 \
   --html=on \
   --notifications=no \
@@ -89,7 +90,7 @@ echo "Access via: http://localhost:14500"
 while true; do
   sleep 30
   # Check if xpra is still running
-  if ! pgrep -f "xpra.*:100" > /dev/null; then
+  if ! pgrep -f "xpra.*:42" > /dev/null; then
     echo "XPRA process died, restarting..."
     break
   fi

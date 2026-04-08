@@ -15,7 +15,7 @@ trap cleanup SIGTERM SIGINT EXIT
 
 export DISPLAY=:99
 export LIBGL_ALWAYS_SOFTWARE=1
-export NO_AT_BRIDGE=1
+export NO_AT_BRIDGE=2
 
 APP_DIR=/app/downloads
 APP_IMAGE=${APP_DIR}/app.AppImage
@@ -41,8 +41,15 @@ APP_RUN="${EXTRACT_DIR}/AppRun"
 # Set APPDIR for AppRun script to find chat2api binary
 export APPDIR="${EXTRACT_DIR}"
 
+# Fix Xsession error
+[ -f /etc/X11/Xsession ] && cp /etc/X11/Xsession /etc/X11/Xsession.backup
+echo "#!/bin/bash" > /etc/X11/Xsession
+echo "exit 0" >> /etc/X11/Xsession
+chmod +x /etc/X11/Xsession
+
 echo "=== Cleanup Xvfb lock files ==="
 rm -f /tmp/.X99-lock /tmp/.X11-unix/X99
+rm -f /tmp/.X100-lock /tmp/.X11-unix/X100
 
 echo "=== Check XPRA availability ==="
 if ! command -v xpra &> /dev/null; then
@@ -50,13 +57,18 @@ if ! command -v xpra &> /dev/null; then
   apt update && apt install -y xpra
 fi
 
-echo "=== 启动 Xvfb ==="
-Xvfb :99 -screen 0 1920x1080x24 -ac +extension GLX +render &
+echo "=== Start Xvfb ==="
+Xvfb :99 -screen 0 2560x1440x24 -ac +extension GLX +render &
 sleep 2
 
 echo "=== 启动 XPRA (HTML5) ==="
 
-xpra start :100 \
+# Install coreutils to get the true command
+if ! command -v true &> /dev/null; then
+  apt update && apt install -y coreutils
+fi
+
+xpra start :99 \
   --bind-tcp=0.0.0.0:14500 \
   --html=on \
   --notifications=no \

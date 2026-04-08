@@ -45,6 +45,11 @@ COPY download-appimage.sh /app/download-appimage.sh
 
 RUN chmod +x /app/start.sh /app/download-appimage.sh
 
+# Fix Xsession error to prevent "true not found" error
+RUN echo "#!/bin/bash" > /etc/X11/Xsession && \
+    echo "exit 0" >> /etc/X11/Xsession && \
+    chmod +x /etc/X11/Xsession
+
 EXPOSE 14500 8080
 
 CMD ["/app/start.sh"]

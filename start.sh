@@ -111,16 +111,20 @@ xpra start :42 \
   --notifications=no \
   --mdns=no \
   --daemon=no \
-  --min-quality=50 \
-  --quality=70 \
-  --compression=0 \
+  --min-quality=30 \
+  --quality=50 \
+  --speed=100 \
+  --auto-refresh-delay=0 \
+  --batch-delay=5 \
+  --compression=1 \
+  --encoding=rgb \
   --idle-timeout=0 \
   --server-idle-timeout=0 \
   --exit-with-children=no \
   --exit-with-client=no \
   --resize-display=no \
   --dpi=96 \
-  --max-size=2560x1440 \
+  --max-size=1920x1080 \
   --start="${APP_RUN} \
     --no-sandbox \
     --disable-gpu \

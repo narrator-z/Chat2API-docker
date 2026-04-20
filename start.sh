@@ -115,7 +115,6 @@ xpra start :42 \
   --quality=50 \
   --speed=100 \
   --auto-refresh-delay=0 \
-  --batch-delay=5 \
   --compression=1 \
   --encoding=rgb \
   --idle-timeout=0 \

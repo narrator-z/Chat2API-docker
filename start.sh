@@ -85,9 +85,19 @@ EOF
 
 echo "=== Starting DBus ==="
 mkdir -p /var/run/dbus
+mkdir -p /run/user/0
 dbus-daemon --system --fork 2>/dev/null || true
-dbus-daemon --session --fork 2>/dev/null || true
-export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/0/bus
+# Create session bus with explicit address
+dbus-launch --sh-syntax 2>/dev/null > /tmp/dbus-env || true
+if [ -f /tmp/dbus-env ]; then
+    source /tmp/dbus-env
+fi
+# Fallback if dbus-launch didn't work
+if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
+    dbus-daemon --session --fork --address=unix:path=/run/user/0/bus 2>/dev/null || true
+    export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/0/bus
+fi
+export NO_AT_BRIDGE=1
 
 # Wait for dbus to be ready
 sleep 1
@@ -101,7 +111,6 @@ xpra start :42 \
   --notifications=no \
   --mdns=no \
   --daemon=no \
-  --video-encoders=jpeg \
   --min-quality=50 \
   --quality=70 \
   --compression=0 \

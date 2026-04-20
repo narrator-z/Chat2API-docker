@@ -36,6 +36,8 @@ RUN apt update && apt install -y \
     libxcomposite1 \
     libx11-xcb1 \
     libfuse2 \
+    menu \
+    desktop-file-utils \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

@@ -69,20 +69,47 @@ if ! command -v true &> /dev/null; then
   apt update && apt install -y coreutils
 fi
 
+# Fix xdg menu errors by creating minimal menu or disabling it
+export XDG_CONFIG_DIRS=/tmp/xdg
+mkdir -p /tmp/xdg/menus
+# Create empty menu file to prevent parsing errors
+cat > /tmp/xdg/menus/applications.menu << 'EOF'
+<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 2.0//EN"
+ "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
+<Menu>
+  <Name>Applications</Name>
+  <DefaultAppDirs/>
+  <DefaultDirectoryDirs/>
+</Menu>
+EOF
+
+echo "=== Starting XPRA with stability settings ==="
+
 xpra start :42 \
   --use-display \
   --bind-tcp=0.0.0.0:14500 \
   --html=on \
   --notifications=no \
   --mdns=no \
+  --daemon=no \
+  --encoding=jpeg \
+  --min-quality=50 \
+  --quality=70 \
+  --compression=0 \
+  --idle-timeout=0 \
+  --server-idle-timeout=0 \
+  --exit-with-children=no \
+  --exit-with-client=no \
+  --resize-display=no \
+  --dpi=96 \
+  --max-size=2560x1440 \
   --start="${APP_RUN} \
     --no-sandbox \
     --disable-gpu \
     --disable-dev-shm-usage \
     --disable-software-rasterizer \
     --disable-setuid-sandbox \
-    --ozone-platform=x11" \
-  --daemon=no
+    --ozone-platform=x11"
 
 echo "=== Application started ==="
 echo "Access via: http://localhost:14500"

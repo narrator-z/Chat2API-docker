@@ -83,6 +83,15 @@ cat > /tmp/xdg/menus/applications.menu << 'EOF'
 </Menu>
 EOF
 
+echo "=== Starting DBus ==="
+mkdir -p /var/run/dbus
+dbus-daemon --system --fork 2>/dev/null || true
+dbus-daemon --session --fork 2>/dev/null || true
+export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/0/bus
+
+# Wait for dbus to be ready
+sleep 1
+
 echo "=== Starting XPRA with stability settings ==="
 
 xpra start :42 \
@@ -92,7 +101,7 @@ xpra start :42 \
   --notifications=no \
   --mdns=no \
   --daemon=no \
-  --encoding=jpeg \
+  --video-encoders=jpeg \
   --min-quality=50 \
   --quality=70 \
   --compression=0 \

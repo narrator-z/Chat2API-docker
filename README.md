@@ -16,8 +16,8 @@ This project provides a Docker containerization of [Chat2API](https://github.com
 - **Multiple AI Providers**: Supports DeepSeek, GLM, Kimi, MiniMax, Qwen, Z.ai and more
 - **Cross-Platform**: Runs on any Docker-compatible system (Linux, Windows, macOS)
 - **Headless Operation**: Perfect for server deployment without GUI requirements
-- **Automatic Updates**: Downloads the latest x86_64 AppImage from Chat2API releases during build
-- **Web Interface**: Includes noVNC for web-based access to the application interface
+- **Automatic Updates**: Downloads the latest AppImage (supports amd64 and arm64) from Chat2API releases during build
+- **Web Interface**: Includes xpra (HTML5) for web-based access to the application interface
 
 ### Supported AI Service Providers
 
@@ -44,7 +44,12 @@ This project provides a Docker containerization of [Chat2API](https://github.com
    mkdir config
    ```
 
-3. Start with the published image:
+3. Create the external network (required):
+   ```bash
+   docker network create chat2api
+   ```
+
+4. Start with the published image:
    ```bash
    docker-compose up -d
    ```
@@ -62,36 +67,53 @@ This project provides a Docker containerization of [Chat2API](https://github.com
    mkdir config
    ```
 
-3. Build and run from source:
+3. Create the external network (required):
    ```bash
-   docker-compose -f docker-compose.build.yml up -d
+   docker network create chat2api
+   ```
+
+4. Build the image:
+   ```bash
+   docker build -t chat2api-docker .
+   ```
+
+5. Update docker-compose.yml to use the local image:
+   ```yaml
+   services:
+     chat2api:
+       image: chat2api-docker
+   ```
+
+6. Start the container:
+   ```bash
+   docker-compose up -d
    ```
 
 #### Access the Application
 
-- Web Interface: http://localhost:6080
-- API Endpoint: http://localhost:8080
+- Web Interface: http://localhost:14500
+- API Endpoint: http://localhost:58002
 
-### Docker Compose Files
+### Docker Compose Configuration
 
 - **`docker-compose.yml`** - Uses the pre-built image from GitHub Container Registry
-- **`docker-compose.build.yml`** - Builds the image from source locally
+- Requires an external network named `chat2api` to be created before starting
 
 ### GitHub CDN Proxy
 
-GitHub CDN proxy is **enabled by default** for faster download speeds. To disable it:
+GitHub CDN proxy is **disabled by default**. To enable it for faster download speeds:
 
-1. Edit your `docker-compose.yml` or `docker-compose.build.yml`:
+1. Edit your `docker-compose.yml`:
    ```yaml
    services:
      chat2api:
        environment:
-         - USE_GITHUB_CDN=false
+         - USE_GITHUB_CDN=true
    ```
 
 2. Or use environment variable:
    ```bash
-   USE_GITHUB_CDN=false docker-compose up -d
+   USE_GITHUB_CDN=true docker-compose up -d
    ```
 
 When enabled, AppImage will be downloaded through `https://gh-proxy.org/` for faster access.
@@ -134,8 +156,8 @@ This will:
 - Configuration files should be placed in `./config` directory
 - The config directory is mounted to `/root/` in the container
 - Downloaded AppImage files are available in `./downloads` directory
-- Port 6080: Web interface (noVNC)
-- Port 8080: API endpoint
+- Port 14500: Web interface (xpra HTML5)
+- Port 58002: API endpoint
 
 ### Volume Mounts
 
@@ -147,9 +169,10 @@ This will:
 This Docker setup includes:
 - Debian 12 base image
 - Virtual display (Xvfb) for headless operation
-- noVNC web interface
+- xpra HTML5 web interface
 - All necessary dependencies for Chat2API AppImage
 - Automatic download of the latest Chat2API release
+- Support for both amd64 and arm64 architectures
 
 ### Original Project
 
@@ -212,8 +235,8 @@ print(response.choices[0].message.content)
 - **多 AI 提供商支持**：支持 DeepSeek、GLM、Kimi、MiniMax、Qwen、Z.ai 等
 - **跨平台**：可在任何兼容 Docker 的系统上运行（Linux、Windows、macOS）
 - **无头运行**：完美适用于无需 GUI 的服务器部署
-- **自动更新**：构建时从 Chat2API 发布版本自动下载最新的 x86_64 AppImage
-- **Web 界面**：包含 noVNC 用于基于 Web 的应用程序界面访问
+- **自动更新**：构建时从 Chat2API 发布版本自动下载最新的 AppImage（支持 amd64 和 arm64）
+- **Web 界面**：包含 xpra (HTML5) 用于基于 Web 的应用程序界面访问
 
 ### 支持的 AI 服务提供商
 
@@ -240,7 +263,12 @@ print(response.choices[0].message.content)
    mkdir config
    ```
 
-3. 使用发布镜像启动：
+3. 创建外部网络（必需）：
+   ```bash
+   docker network create chat2api
+   ```
+
+4. 使用发布镜像启动：
    ```bash
    docker-compose up -d
    ```
@@ -258,36 +286,53 @@ print(response.choices[0].message.content)
    mkdir config
    ```
 
-3. 从源代码构建并运行：
+3. 创建外部网络（必需）：
    ```bash
-   docker-compose -f docker-compose.build.yml up -d
+   docker network create chat2api
+   ```
+
+4. 构建镜像：
+   ```bash
+   docker build -t chat2api-docker .
+   ```
+
+5. 更新 docker-compose.yml 以使用本地镜像：
+   ```yaml
+   services:
+     chat2api:
+       image: chat2api-docker
+   ```
+
+6. 启动容器：
+   ```bash
+   docker-compose up -d
    ```
 
 #### 访问应用程序
 
-- Web 界面：http://localhost:6080
-- API 端点：http://localhost:8080
+- Web 界面：http://localhost:14500
+- API 端点：http://localhost:58002
 
-### Docker Compose 文件
+### Docker Compose 配置
 
 - **`docker-compose.yml`** - 使用 GitHub Container Registry 中的预构建镜像
-- **`docker-compose.build.yml`** - 从源代码本地构建镜像
+- 需要在启动前创建名为 `chat2api` 的外部网络
 
 ### GitHub CDN 代理
 
-GitHub CDN 代理**默认启用**以获得更快的下载速度。如需禁用：
+GitHub CDN 代理**默认禁用**。如需启用以获得更快的下载速度：
 
-1. 编辑你的 `docker-compose.yml` 或 `docker-compose.build.yml`：
+1. 编辑你的 `docker-compose.yml`：
    ```yaml
    services:
      chat2api:
        environment:
-         - USE_GITHUB_CDN=false
+         - USE_GITHUB_CDN=true
    ```
 
 2. 或使用环境变量：
    ```bash
-   USE_GITHUB_CDN=false docker-compose up -d
+   USE_GITHUB_CDN=true docker-compose up -d
    ```
 
 启用后，AppImage 将通过 `https://gh-proxy.org/` 下载以获得更快的访问速度。
@@ -330,8 +375,8 @@ git push origin v1.0.1
 - 配置文件应放置在 `./config` 目录中
 - 配置目录挂载到容器内的 `/root/` 目录
 - 下载的 AppImage 文件可在 `./downloads` 目录中访问
-- 端口 6080：Web 界面（noVNC）
-- 端口 8080：API 端点
+- 端口 14500：Web 界面（xpra HTML5）
+- 端口 58002：API 端点
 
 ### 卷挂载
 
@@ -343,9 +388,10 @@ git push origin v1.0.1
 此 Docker 设置包含：
 - Debian 12 基础镜像
 - 用于无头操作的虚拟显示（Xvfb）
-- noVNC Web 界面
+- xpra HTML5 Web 界面
 - Chat2API AppImage 所需的所有依赖项
 - 自动下载最新的 Chat2API 发布版本
+- 支持 amd64 和 arm64 架构
 
 ### 原始项目
 

@@ -59,7 +59,7 @@ if ! command -v xpra &> /dev/null; then
 fi
 
 echo "=== Start Xvfb ==="
-Xvfb :42 -screen 0 2560x1440x24 -ac +extension GLX +render &
+Xvfb :42 -screen 0 1280x720x24 -ac +extension GLX +render &
 sleep 2
 
 echo "=== 启动 XPRA (HTML5) ==="
@@ -114,16 +114,16 @@ xpra start :42 \
   --min-quality=30 \
   --quality=50 \
   --speed=100 \
-  --auto-refresh-delay=0 \
-  --compression=1 \
-  --encoding=rgb \
+  --auto-refresh-delay=500 \
+  --compression=6 \
+  --encoding=h264 \
   --idle-timeout=0 \
   --server-idle-timeout=0 \
   --exit-with-children=no \
   --exit-with-client=no \
   --resize-display=no \
   --dpi=96 \
-  --max-size=1920x1080 \
+  --max-size=1280x720 \
   --start="${APP_RUN} \
     --no-sandbox \
     --disable-gpu \

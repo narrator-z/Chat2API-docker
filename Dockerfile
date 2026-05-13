@@ -1,60 +1,20 @@
-# ⚠️ DEPRECATED: 本项目因性能问题已弃用，请移步 https://github.com/narrator-z/Chat2API
-# ⚠️ DEPRECATED: This project is abandoned due to performance issues, see https://github.com/narrator-z/Chat2API
+# 使用官方 Node.js 运行时作为基础镜像
+FROM node:18-alpine
 
-FROM debian:12
+# 设置工作目录
+WORKDIR /usr/src/app
 
-ENV DEBIAN_FRONTEND=noninteractive
-ENV DISPLAY=:99
+# 复制 package.json 和 package-lock.json
+COPY package*.json ./
 
-# 换源
-RUN echo "deb http://mirrors.aliyun.com/debian bookworm main contrib non-free non-free-firmware" > /etc/apt/sources.list && \
-    echo "deb http://mirrors.aliyun.com/debian bookworm-updates main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
-    echo "deb http://mirrors.aliyun.com/debian-security bookworm-security main contrib non-free non-free-firmware" >> /etc/apt/sources.list
+# 安装依赖
+RUN npm ci --only=production
 
-# Install xpra + headless X + noVNC dependencies + Chinese fonts
-RUN apt update && apt install -y \
-    curl \
-    xvfb \
-    xpra \
-    x11-utils \
-    netcat-openbsd \
-    ca-certificates \
-    iproute2 \
-    websockify \
-    novnc \
-    x11vnc \
-    dbus \
-    dbus-x11 \
-    fonts-wqy-zenhei \
-    fonts-wqy-microhei \
-    libgtk-3-0 \
-    libnss3 \
-    libxss1 \
-    libasound2 \
-    libgbm1 \
-    libdrm2 \
-    libgl1 \
-    libxrandr2 \
-    libxdamage1 \
-    libxcomposite1 \
-    libx11-xcb1 \
-    libfuse2 \
-    menu \
-    desktop-file-utils \
-    && rm -rf /var/lib/apt/lists/*
+# 复制应用代码
+COPY . .
 
-WORKDIR /app
+# 暴露应用端口 (根据实际应用调整)
+EXPOSE 3000
 
-COPY start.sh /app/start.sh
-COPY download-appimage.sh /app/download-appimage.sh
-
-RUN chmod +x /app/start.sh /app/download-appimage.sh
-
-# Fix Xsession error to prevent "true not found" error
-RUN echo "#!/bin/bash" > /etc/X11/Xsession && \
-    echo "exit 0" >> /etc/X11/Xsession && \
-    chmod +x /etc/X11/Xsession
-
-EXPOSE 14500 8080
-
-CMD ["/app/start.sh"]
+# 启动应用命令 (根据实际应用调整)
+CMD [ "node", "server.js" ]

@@ -1,4 +1,14 @@
-# Chat2API Docker
+# ⚠️ 项目已弃用 / Project Deprecated
+
+**中文：** 由于性能问题，本项目已不再维护。请移步至新项目获取 Docker 部署指导：
+👉 **[https://github.com/narrator-z/Chat2API](https://github.com/narrator-z/Chat2API)**
+
+**English:** Due to performance issues, this project is no longer maintained. Please visit the new project for Docker deployment guidance:
+👉 **[https://github.com/narrator-z/Chat2API](https://github.com/narrator-z/Chat2API)**
+
+---
+
+# Chat2API Docker (Deprecated)
 
 [English](#english) | [中文](#中文)
 

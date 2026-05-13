@@ -1,3 +1,6 @@
+# ⚠️ DEPRECATED: 本项目因性能问题已弃用，请移步 https://github.com/narrator-z/Chat2API
+# ⚠️ DEPRECATED: This project is abandoned due to performance issues, see https://github.com/narrator-z/Chat2API
+
 FROM debian:12
 
 ENV DEBIAN_FRONTEND=noninteractive
